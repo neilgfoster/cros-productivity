@@ -22,11 +22,6 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
   read -r sync_folders < /dev/tty
   sync_folders=${sync_folders:-ChromeOS}
 
-  # Prompt for sync period
-  echo -ne "${YELLOW}Enter the sync period in seconds (default: 60): ${NC}"
-  read -r sync_period < /dev/tty
-  sync_period=${sync_period:-60}
-
   # Install dependencies
   echo
   sudo apt install -y wget gpg
@@ -39,14 +34,6 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/${REPO_VER}/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
   sudo apt update
   sudo apt install -y onedrive
-
-  # Run authentication if not already done
-  if [ ! -f ~/.config/onedrive/refresh_token ]; then
-    echo
-    echo -e "${YELLOW}You will be now prompted to authenticate with your Microsoft account.${NC}"
-    echo
-    onedrive < /dev/tty
-  fi
 
   # Create local sync directory
   mkdir -p ~/${target_dir}
@@ -76,9 +63,17 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
     sed -i "s|^monitor_interval.*|monitor_interval = \"${sync_period}\"|" ~/.config/onedrive/config
   fi
 
+  # Run authentication if not already done
+  if [ ! -f ~/.config/onedrive/refresh_token ]; then
+    echo
+    echo -e "${YELLOW}You will be now prompted to authenticate with your Microsoft account.${NC}"
+    echo
+    onedrive < /dev/tty
+    onedrive --resync --synchronize < /dev/tty
+  fi
+
   # Enable and start the systemd user service
   if ! systemctl --user is-enabled onedrive &>/dev/null; then
-    onedrive --resync --synchronize -y < /dev/tty
     systemctl --user enable onedrive
   fi
   if ! systemctl --user is-active onedrive &>/dev/null; then
