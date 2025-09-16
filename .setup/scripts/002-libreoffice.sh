@@ -21,8 +21,8 @@ if [[ $install_libreoffice =~ ^[Yy]$ ]]; then
   # Prompt for dark mode tweaks
   echo
   echo -ne "${YELLOW}Apply dark mode tweaks to LibreOffice launchers? [Y]: ${NC}"
-  echo
   read -r dark_mode < /dev/tty
+  echo
   dark_mode=${dark_mode:-Y}
   if [[ $dark_mode =~ ^[Yy]$ ]]; then
     for desktop_file in \
