@@ -6,7 +6,7 @@ set -e
 
 # Prompt for install
 echo
-echo -e "${YELLOW}Install OneDrive? [Y]${NC}"
+echo -ne "${YELLOW}Install OneDrive? [Y]: ${NC}"
 read -r install_onedrive < /dev/tty
 echo
 install_onedrive=${install_onedrive:-Y}
@@ -18,12 +18,12 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
   target_dir=${target_dir:-onedrive}
 
   # Prompt for folders to sync
-  echo -ne "${YELLOW}Enter the OneDrive folders to sync (comma separated, default: ChromeOS):${NC}"
+  echo -ne "${YELLOW}Enter the OneDrive folders to sync (comma separated, default: ChromeOS): ${NC}"
   read -r sync_folders < /dev/tty
   sync_folders=${sync_folders:-ChromeOS}
 
   # Prompt for sync period
-  echo -ne "${YELLOW}Enter the sync period in seconds (default: 60):${NC}"
+  echo -ne "${YELLOW}Enter the sync period in seconds (default: 60): ${NC}"
   read -r sync_period < /dev/tty
   sync_period=${sync_period:-60}
 
