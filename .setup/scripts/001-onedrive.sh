@@ -6,12 +6,14 @@ set -e
 # Install dependencies
 sudo apt install -y wget gpg
 
-# Install onedrive using OpenSuSE Build Service repository (recommended)
-# For Ubuntu 22.04 (Jammy). Change xUbuntu_22.04 to match your OS if needed.
-wget -qO - https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /usr/share/keyrings/obs-onedrive.gpg > /dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
+# Cleanup old OneDrive installations and config
+DEB_VER=$(lsb_release -r | awk '{print $2}')
+REPO_VER="Debian_${DEB_VER}"
+sudo rm -f /etc/apt/sources.list.d/onedrive.list
+wget -qO - "https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/${REPO_VER}/Release.key" | gpg --dearmor | sudo tee /usr/share/keyrings/obs-onedrive.gpg > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/obs-onedrive.gpg] https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/${REPO_VER}/ ./" | sudo tee /etc/apt/sources.list.d/onedrive.list
 sudo apt update
-sudo apt install --no-install-recommends --no-install-suggests -y onedrive
+sudo apt install -y onedrive
 
 # Create local sync directory
 mkdir -p ~/onedrive
