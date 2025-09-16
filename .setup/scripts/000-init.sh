@@ -21,4 +21,3 @@ if [ -z "$(git config --global user.email)" ]; then
   read git_email < /dev/tty
   git config --global user.email "$git_email"
 fi
-echofea
