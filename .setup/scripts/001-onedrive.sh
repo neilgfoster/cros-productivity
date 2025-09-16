@@ -31,6 +31,7 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
   sync_period=${sync_period:-60}
 
   # Install dependencies
+  echo
   sudo apt install -y wget gpg
 
   # Cleanup old OneDrive installations and config

@@ -23,7 +23,7 @@ This repository automates the setup of a ChromeOS Linux environment by:
 	- `setup.sh`: Main entry point for interactive environment setup and repo initialization
 	- `scripts/000-init.sh`: Installs git, git-lfs, and configures global git settings
 	- `scripts/001-onedrive.sh`: Installs and configures OneDrive with user prompts for target directory, folders to sync, and sync interval
-	- `scripts/002-libreoffice.sh`: Installs LibreOffice and forces dark mode in desktop launchers
+	- `scripts/002-libreoffice.sh`: Installs LibreOffice and optionally applies dark mode to desktop launchers
 - `.github/` — Contains repository configuration files:
 	- `CODEOWNERS`: Declares repository ownership
 - `README.md` — This documentation file
