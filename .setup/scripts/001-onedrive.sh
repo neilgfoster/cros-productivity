@@ -12,9 +12,6 @@ echo
 install_onedrive=${install_onedrive:-Y}
 if [[ $install_onedrive =~ ^[Yy]$ ]]; then
 
-  # Remove old config
-  rm -f ~/.config/onedrive/config
-
   # Prompt for target directory
   echo -ne "${YELLOW}Enter the target directory (default: ~/onedrive): ${NC}"
   read -r target_dir < /dev/tty
@@ -25,16 +22,11 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
   read -r sync_folders < /dev/tty
   sync_folders=${sync_folders:-ChromeOS}
 
-  # Prompt for sync period
-  echo -ne "${YELLOW}Enter the sync period in seconds (default: 60): ${NC}"
-  read -r sync_period < /dev/tty
-  sync_period=${sync_period:-60}
-
   # Install dependencies
   echo
   sudo apt install -y wget gpg
 
-  # Cleanup old OneDrive installations and config
+  # Install OneDrive client from OBS repository
   DEB_VER=$(lsb_release -r | awk '{print $2}')
   REPO_VER="Debian_${DEB_VER}"
   sudo rm -f /etc/apt/sources.list.d/onedrive.list
@@ -48,6 +40,9 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
 
   # Create OneDrive config directory if it doesn't exist
   mkdir -p ~/.config/onedrive
+
+  # Remove old config
+  rm -f ~/.config/onedrive/config
 
   # Set sync_list to include specified folders
   IFS=',' read -ra FOLDERS <<< "$sync_folders"
@@ -74,14 +69,15 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
     echo -e "${YELLOW}You will be now prompted to authenticate with your Microsoft account.${NC}"
     echo
     onedrive < /dev/tty
-    onedrive --resync --synchronize -y < /dev/tty
+    onedrive --resync --synchronize < /dev/tty
   fi
-fi
 
-# Enable and start OneDrive systemd user service for background sync
-if ! systemctl --user is-enabled onedrive &>/dev/null; then
-  systemctl --user enable onedrive
-fi
-if ! systemctl --user is-active onedrive &>/dev/null; then
-  systemctl --user start onedrive
+  # Enable and start the systemd user service
+  if ! systemctl --user is-enabled onedrive &>/dev/null; then
+    systemctl --user enable onedrive
+  fi
+  if ! systemctl --user is-active onedrive &>/dev/null; then
+    systemctl --user start onedrive
+  fi
+
 fi
