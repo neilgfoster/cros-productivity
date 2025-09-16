@@ -51,16 +51,11 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
     echo "${folder// /}/" >> ~/.config/onedrive/sync_list
   done
 
-  # Set sync_dir and monitor_interval in config (create if missing)
+  # Set sync_dir in config
   if ! grep -q '^sync_dir' ~/.config/onedrive/config 2>/dev/null; then
     echo "sync_dir = \"~/${target_dir}\"" >> ~/.config/onedrive/config
   else
     sed -i "s|^sync_dir.*|sync_dir = \"~/${target_dir}\"|" ~/.config/onedrive/config
-  fi
-  if ! grep -q '^monitor_interval' ~/.config/onedrive/config 2>/dev/null; then
-    echo "monitor_interval = \"${sync_period}\"" >> ~/.config/onedrive/config
-  else
-    sed -i "s|^monitor_interval.*|monitor_interval = \"${sync_period}\"|" ~/.config/onedrive/config
   fi
 
   # Run authentication if not already done
