@@ -24,18 +24,25 @@ mkdir -p ~/.config/onedrive
 # Set sync_list to only include 'ChromeOS/'
 echo "ChromeOS/" > ~/.config/onedrive/sync_list
 
-# Set sync_dir in config (create if missing)
+# Set sync_dir and monitor_interval in config (create if missing)
 if ! grep -q '^sync_dir' ~/.config/onedrive/config 2>/dev/null; then
   echo "sync_dir = \"~/onedrive\"" >> ~/.config/onedrive/config
 else
   sed -i 's|^sync_dir.*|sync_dir = "~/onedrive"|' ~/.config/onedrive/config
 fi
+if ! grep -q '^monitor_interval' ~/.config/onedrive/config 2>/dev/null; then
+  echo "monitor_interval = 60" >> ~/.config/onedrive/config
+else
+  sed -i 's|^monitor_interval.*|monitor_interval = 60|' ~/.config/onedrive/config
+fi
 
 # Run authentication if not already done
 if [ ! -f ~/.config/onedrive/refresh_token ]; then
-  echo "\n=== OneDrive Authentication Required ==="
-  echo "Launching 'onedrive' for authentication..."
-  onedrive
+  echo
+  echo -e "${YELLOW}You will be now prompted to authenticate with your Microsoft account.${NC}"
+  echo
+  onedrive < /dev/tty
+  onedrive --resync --synchronize < /dev/tty
   if [ ! -f ~/.config/onedrive/refresh_token ]; then
     echo "Authentication failed or not completed. Please run 'onedrive' manually and re-run this script."
     exit 1
@@ -43,5 +50,9 @@ if [ ! -f ~/.config/onedrive/refresh_token ]; then
 fi
 
 # Enable and start OneDrive systemd user service for background sync
-systemctl --user enable onedrive
-systemctl --user start onedrive
+if ! systemctl --user is-enabled onedrive &>/dev/null; then
+  systemctl --user enable onedrive
+fi
+if ! systemctl --user is-active onedrive &>/dev/null; then
+  systemctl --user start onedrive
+fi
