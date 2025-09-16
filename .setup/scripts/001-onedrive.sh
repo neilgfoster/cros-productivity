@@ -12,6 +12,9 @@ echo
 install_onedrive=${install_onedrive:-Y}
 if [[ $install_onedrive =~ ^[Yy]$ ]]; then
 
+  # Remove old config
+  rm -f ~/.config/onedrive/config
+
   # Prompt for target directory
   echo -ne "${YELLOW}Enter the target directory (default: ~/onedrive): ${NC}"
   read -r target_dir < /dev/tty
@@ -59,9 +62,9 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
     sed -i "s|^sync_dir.*|sync_dir = \"~/${target_dir}\"|" ~/.config/onedrive/config
   fi
   if ! grep -q '^monitor_interval' ~/.config/onedrive/config 2>/dev/null; then
-    echo "monitor_interval=${sync_period}" >> ~/.config/onedrive/config
+    echo "monitor_interval = \"${sync_period}\"" >> ~/.config/onedrive/config
   else
-    sed -i "s|^monitor_interval.*|monitor_interval=${sync_period}|" ~/.config/onedrive/config
+    sed -i "s|^monitor_interval.*|monitor_interval = \"${sync_period}\"|" ~/.config/onedrive/config
   fi
 
   # Run authentication if not already done
@@ -70,7 +73,7 @@ if [[ $install_onedrive =~ ^[Yy]$ ]]; then
     echo -e "${YELLOW}You will be now prompted to authenticate with your Microsoft account.${NC}"
     echo
     onedrive < /dev/tty
-    onedrive --resync --synchronize < /dev/tty
+    onedrive --resync --synchronize -y < /dev/tty
   fi
 fi
 
